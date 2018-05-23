@@ -1,4 +1,4 @@
-obj-m += my_hrt_mod.o
+obj-m += hrt_mod.o
 
 all:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
