@@ -14,7 +14,7 @@ obj-m:= pulse.o
 all:
 	
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
-	$(CC) -Wall -o $(APP) main.c -pthread -lm 
+	$(CC) -Wall -o $(APP) application.c -pthread -lm 
 
 clean:
 	rm -f *.ko
