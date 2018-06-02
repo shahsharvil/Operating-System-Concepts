@@ -54,17 +54,17 @@ static irqreturn_t
 pulse_interrupt_handler(int irq, void *dev_id)
 {	
 	if(echo_pulse_rec == false)
-	{
-		dev_ptr->pulse_rising_time = tsc();
-	    irq_set_irq_type(irq, IRQF_TRIGGER_FALLING);
-	    echo_pulse_rec = true;
+	{	
+	    	dev_ptr->pulse_rising_time = tsc();
+	    	irq_set_irq_type(irq, IRQF_TRIGGER_FALLING);
+	    	echo_pulse_rec = true;
 	}
 	else
 	{
-		dev_ptr->pulse_falling_time = tsc();
-	    irq_set_irq_type(irq, IRQF_TRIGGER_RISING);
-	    echo_pulse_rec = false;
-		dev_ptr->busy_flag = 0;
+	    	dev_ptr->pulse_falling_time = tsc();
+	    	irq_set_irq_type(irq, IRQF_TRIGGER_RISING);
+	    	echo_pulse_rec = false;
+	    	dev_ptr->busy_flag = 0;
 	}
 	return IRQ_HANDLED;
 }
@@ -126,11 +126,11 @@ pulse_driver_open(struct inode *inode, struct file *filp)
 	dev_ptr->pulse_falling_time = 0;
 	
 	/* register interrupt handler function */
-	ret = request_irq(irq_line_no,
-					  (irq_handler_t)pulse_interrupt_handler,
-					  IRQF_TRIGGER_RISING,
-					  "interrupt_state_change", 
-					  dev_ptr);
+	ret = request_irq(irq_line_no, 
+			  (irq_handler_t)pulse_interrupt_handler,
+			  IRQF_TRIGGER_RISING,
+			  "interrupt_state_change", 
+			  dev_ptr);
 
 	if(ret)
 	{
@@ -208,7 +208,7 @@ pulse_driver_read(struct file *file, char *buf, size_t count, loff_t *ptr)
 	else
 	{
 		if(dev_ptr->pulse_rising_time == 0 && 
-			dev_ptr->pulse_falling_time == 0)
+		   dev_ptr->pulse_falling_time == 0)
 		{
 			printk("Please Trigger the measure first\n");
 		}
@@ -216,7 +216,7 @@ pulse_driver_read(struct file *file, char *buf, size_t count, loff_t *ptr)
 		{	
 			/* copy latest time delta computed to user space */
 			delta = (dev_ptr->pulse_falling_time) - 
-				    (dev_ptr->pulse_rising_time);			
+				(dev_ptr->pulse_rising_time);			
 
 			ret = copy_to_user((void *)buf, (const void *)&delta, sizeof(delta));
 
@@ -316,7 +316,7 @@ __init pulse_driver_init(void)
 
 	/* connect major and minor numbers to cdev */
 	ret = cdev_add(&dev_ptr->cdev, 
-		           MKDEV(MAJOR(dev_num), MINOR(dev_num)), 1);
+		       MKDEV(MAJOR(dev_num), MINOR(dev_num)), 1);
 	if(ret)
 	{
 		printk("Bad cdev\n");
@@ -325,8 +325,8 @@ __init pulse_driver_init(void)
 
 	/* create device */
 	device_create(dev_class, NULL, 
-		          MKDEV(MAJOR(dev_num), MINOR(dev_num)), 
-				  NULL, "%s", DEVICE_NAME);
+		      MKDEV(MAJOR(dev_num), MINOR(dev_num)), 
+		      NULL, "%s", DEVICE_NAME);
 
 	printk("pulse module initialized\n");
 	
