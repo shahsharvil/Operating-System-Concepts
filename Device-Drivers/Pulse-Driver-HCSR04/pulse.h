@@ -23,4 +23,4 @@ struct pulse_dev
 	uint64_t pulse_falling_time;	/* time stamp of falling pulse */
 }; 
 
-#endif /* _PULSE_H_ *
+#endif /* _PULSE_H_ */
