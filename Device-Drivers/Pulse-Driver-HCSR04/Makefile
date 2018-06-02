@@ -2,8 +2,7 @@ obj-m := pulse.o
 
 KDIR  := /opt/iot-devkit/1.7.2/sysroots/i586-poky-linux/usr/src/kernel
 
-all:
-	
+all:	
 	make -C $(KDIR) M=$(PWD) modules
 
 clean:
