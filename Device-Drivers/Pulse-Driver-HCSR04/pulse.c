@@ -9,26 +9,31 @@ Author: Sharvil Shah (spshah16@asu.edu)
 
 *************************************************************************/
 
+#include <linux/module.h>
+#include <linux/init.h>
 
-#include <linux/cdev.h>
+#include <linux/cdev.h>			
 #include <linux/delay.h>
 #include <linux/device.h>
+#include <linux/errno.h>		/* error codes */
 #include <linux/fs.h>
 #include <linux/gpio.h>
 #include <linux/interrupt.h>
 #include <linux/irq.h>
-#include <linux/module.h>
-#include <linux/slab.h>
+#include <linux/slab.h>			/* kmalloc() */
 
-// custom header files
-#include "pulse.h"
+#include "pulse.h"				/* local headers */
 #include "rdtsc.h"
 
-static dev_t pulse_device_num;
-struct class *device_class;
-struct pulse_device_wrap *pulse_device_ptr;
+static dev_t dev_num;			/* stores alloted device number*/
+struct class *dev_class;
+struct pulse_dev *dev_ptr;		/* pointer to device structure */
 
 bool echo_pulse_rec = false;
+
+
+MODULE_AUTHOR("Sharvil Shah");
+MODULE_LICENSE("GPL");
 
 
 /*************************************************************************
@@ -50,16 +55,16 @@ pulse_interrupt_handler(int irq, void *dev_id)
 {	
 	if(echo_pulse_rec == false)
 	{
-		pulse_device_ptr->pulse_rising_time = tsc();
+		dev_ptr->pulse_rising_time = tsc();
 	    irq_set_irq_type(irq, IRQF_TRIGGER_FALLING);
 	    echo_pulse_rec = true;
 	}
 	else
 	{
-		pulse_device_ptr->pulse_falling_time = tsc();
+		dev_ptr->pulse_falling_time = tsc();
 	    irq_set_irq_type(irq, IRQF_TRIGGER_RISING);
 	    echo_pulse_rec = false;
-		pulse_device_ptr->busy_flag = 0;
+		dev_ptr->busy_flag = 0;
 	}
 	return IRQ_HANDLED;
 }
@@ -87,10 +92,10 @@ pulse_driver_open(struct inode *inode, struct file *filp)
 
 	printk(KERN_INFO "Driver: open()\n");
 
-	pulse_device_ptr = container_of(inode->i_cdev, struct pulse_device_wrap, cdev);
-	filp->private_data = pulse_device_ptr;
+	dev_ptr = container_of(inode->i_cdev, struct pulse_dev, cdev);
+	filp->private_data = dev_ptr;
 
-	// free and request gpio's to work with
+	/* free and request gpio's to work with */
 	gpio_free(GP_IO2);
 	gpio_free(GP_IO3);
 	gpio_free(GP_IO2_LEV);
@@ -108,7 +113,7 @@ pulse_driver_open(struct inode *inode, struct file *filp)
 	gpio_direction_input(GP_IO3);
 	gpio_direction_input(GP_IO3_LEV);
 	
-	// get irq # from gpio
+	/* get irq num from gpio */
 	irq_line_no = gpio_to_irq(GP_IO3);
 	if(irq_line_no < 0)
 	{
@@ -116,16 +121,16 @@ pulse_driver_open(struct inode *inode, struct file *filp)
 		return -EINVAL;
 	}
 	
-	pulse_device_ptr->irq = irq_line_no;	
-	pulse_device_ptr->pulse_rising_time = 0;
-	pulse_device_ptr->pulse_falling_time = 0;
+	dev_ptr->irq = irq_line_no;	
+	dev_ptr->pulse_rising_time = 0;
+	dev_ptr->pulse_falling_time = 0;
 	
-	// register interrupt handler function
+	/* register interrupt handler function */
 	ret = request_irq(irq_line_no,
 					  (irq_handler_t)pulse_interrupt_handler,
 					  IRQF_TRIGGER_RISING,
 					  "interrupt_state_change", 
-					  pulse_device_ptr);
+					  dev_ptr);
 
 	if(ret)
 	{
@@ -155,13 +160,10 @@ Return Value: 0 on success
 int
 pulse_driver_release(struct inode *inode, struct file *filp)
 {
-	struct pulse_device_wrap *local_device_ptr;
-	
-	pulse_device_ptr->busy_flag = 0;
-	local_device_ptr = filp->private_data;
+	dev_ptr->busy_flag = 0;
 
-	// free irq and gpio
-	free_irq(pulse_device_ptr->irq, pulse_device_ptr);
+	/* free irq and gpio */
+	free_irq(dev_ptr->irq, dev_ptr);
 	
 	gpio_free(GP_IO2);
 	gpio_free(GP_IO3);
@@ -198,28 +200,28 @@ pulse_driver_read(struct file *file, char *buf, size_t count, loff_t *ptr)
 	int ret = 0;
 	uint64_t delta;
 
-	// return error if time delta not ready
-	if(pulse_device_ptr->busy_flag == 1)
+	/* return error if time delta not ready */
+	if(dev_ptr->busy_flag == 1)
 	{
 		return -EBUSY;
 	}
 	else
 	{
-		if(pulse_device_ptr->pulse_rising_time == 0 && 
-			pulse_device_ptr->pulse_falling_time == 0)
+		if(dev_ptr->pulse_rising_time == 0 && 
+			dev_ptr->pulse_falling_time == 0)
 		{
 			printk("Please Trigger the measure first\n");
 		}
 		else
 		{	
-			// copy latest time delta computed to user space
-			delta = (pulse_device_ptr->pulse_falling_time) - 
-				    (pulse_device_ptr->pulse_rising_time);			
+			/* copy latest time delta computed to user space */
+			delta = (dev_ptr->pulse_falling_time) - 
+				    (dev_ptr->pulse_rising_time);			
 
 			ret = copy_to_user((void *)buf, (const void *)&delta, sizeof(delta));
 
-			pulse_device_ptr->pulse_falling_time = 0; 
-			pulse_device_ptr->pulse_rising_time = 0;	
+			dev_ptr->pulse_falling_time = 0; 
+			dev_ptr->pulse_rising_time = 0;	
 		}
 	}
 
@@ -246,17 +248,17 @@ Return Value: 0 on success
 static ssize_t
 pulse_driver_write(struct file *filp, const char *buf, size_t count, loff_t *ppos)
 {	
-	if(pulse_device_ptr->busy_flag == 1)
+	if(dev_ptr->busy_flag == 1)
 	{
 		return -EBUSY;
 	}	
 	
-	// generate a trigger pulse
+	/* generate a trigger pulse */
 	gpio_set_value(GP_IO2, 1);
 	udelay(15);
 	gpio_set_value(GP_IO2, 0);
 
-	pulse_device_ptr->busy_flag = 1;
+	dev_ptr->busy_flag = 1;
 	return 0;
 }
 
@@ -289,44 +291,44 @@ __init pulse_driver_init(void)
 {
 	int ret;
 
-	// allocate device numbers dynamically
-	if(alloc_chrdev_region(&pulse_device_num, 0, 1, DEVICE_NAME) < 0)
+	/* allocate device numbers dynamically */
+	if(alloc_chrdev_region(&dev_num, 0, 1, DEVICE_NAME) < 0)
 	{
 		printk(KERN_INFO "Can't register device\n");
 		return -1;
 	}
 
-	device_class = class_create(THIS_MODULE, DRIVER_NAME);
+	dev_class = class_create(THIS_MODULE, DRIVER_NAME);
 	
-	// allocate memory for the pulse_device_wrap structure
-	pulse_device_ptr = kmalloc(sizeof(struct pulse_device_wrap), GFP_KERNEL);
-	if(!pulse_device_ptr)
+	/* allocate memory for the pulse_dev structure */
+	dev_ptr = kmalloc(sizeof(struct pulse_dev), GFP_KERNEL);
+	if(!dev_ptr)
 	{
 		printk(KERN_INFO "Bad kmalloc\n");
 		return -ENOMEM;
 	}
 
-	strcpy(pulse_device_ptr->name, DRIVER_NAME);
+	strcpy(dev_ptr->name, DRIVER_NAME);
 
-	// connect file operations with cdev
-	cdev_init(&pulse_device_ptr->cdev, &pulse_driver_fops);
-	pulse_device_ptr->cdev.owner = THIS_MODULE;
+	/* connect file operations with cdev */
+	cdev_init(&dev_ptr->cdev, &pulse_driver_fops);
+	dev_ptr->cdev.owner = THIS_MODULE;
 
-	// connect major and minor numbers to cdev
-	ret = cdev_add(&pulse_device_ptr->cdev, 
-		           MKDEV(MAJOR(pulse_device_num), MINOR(pulse_device_num)), 1);
+	/* connect major and minor numbers to cdev */
+	ret = cdev_add(&dev_ptr->cdev, 
+		           MKDEV(MAJOR(dev_num), MINOR(dev_num)), 1);
 	if(ret)
 	{
 		printk("Bad cdev\n");
 		return ret;
 	}
 
-	// create the device
-	device_create(device_class, NULL, 
-		          MKDEV(MAJOR(pulse_device_num), MINOR(pulse_device_num)), 
+	/* create device */
+	device_create(dev_class, NULL, 
+		          MKDEV(MAJOR(dev_num), MINOR(dev_num)), 
 				  NULL, "%s", DEVICE_NAME);
 
-	printk("Pulse driver Initialized.\n");
+	printk("pulse module initialized\n");
 	
 	return 0;
 }
@@ -345,23 +347,19 @@ Return Value: void
 static void 
 __exit pulse_driver_exit(void)
 {
-	// release major number
-	unregister_chrdev_region(pulse_device_num, 1);
+	/* free device number */
+	unregister_chrdev_region(dev_num, 1);
 
-	// destroy device with Minor number 0
-	device_destroy(device_class, MKDEV(MAJOR(pulse_device_num), 0));
-	cdev_del(&pulse_device_ptr->cdev);
-	kfree(pulse_device_ptr);
+	/* destroy device */
+	device_destroy(dev_class, MKDEV(MAJOR(dev_num), 0));
+	cdev_del(&dev_ptr->cdev);
+	kfree(dev_ptr);
 
-	// destroy driver class
-	class_destroy(device_class);
-	printk("Module removed\n");
+	/* destroy driver class */
+	class_destroy(dev_class);
+	printk("pulse module removed\n");
 }
 
 
 module_init(pulse_driver_init);
 module_exit(pulse_driver_exit);
-
-MODULE_AUTHOR("Sharvil Shah");
-MODULE_DESCRIPTION("Pulse Driver");
-MODULE_LICENSE("GPL v2");
