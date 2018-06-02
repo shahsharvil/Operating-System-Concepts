@@ -179,7 +179,7 @@ pulse_driver_release(struct inode *inode, struct file *filp)
 pulse_driver_read
 
 Input Arguments:
-	1. file  - pointer to file
+	1. filp  - pointer to file
 	2. buf   - address of user space buffer
 	3. count - size of buffer
 	4. prt   - position offset
@@ -195,7 +195,7 @@ Return Value: 0 on success
 
 *************************************************************************/
 static ssize_t
-pulse_driver_read(struct file *file, char *buf, size_t count, loff_t *ptr)
+pulse_driver_read(struct file *filp, char *buf, size_t count, loff_t *ptr)
 {
 	int ret = 0;
 	uint64_t delta;
@@ -233,7 +233,7 @@ pulse_driver_read(struct file *file, char *buf, size_t count, loff_t *ptr)
 pulse_driver_write
 
 Input Arguments:
-	1. file  - pointer to file
+	1. filp  - pointer to file
 	2. buf   - address of user space buffer
 	3. count - size of buffer
 	4. ppos   - position offset
