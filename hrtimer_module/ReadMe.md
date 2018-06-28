@@ -30,7 +30,7 @@ $ svn export https://github.com/shahsharvil/Operating-System-Internals/trunk/hrt
 ```
 # insmod hrt_mod.ko
 ```
-This will initialize and start the hrtimer with a default period of 1 second. The expiry time of timer is extended by this period everytime the timer expires. The number of times the timer is forwarded is controlled by the preprocessor directive 'MAX_ITR`.
+This will initialize and start the hrtimer with a default period of 1 second. The expiry time of timer is extended by this period everytime the timer expires. The number of times the timer is forwarded is controlled by the preprocessor directive `MAX_ITR`.
  
  4. The module can be removed from the kernel anytime after it is inserted using:
 ```
