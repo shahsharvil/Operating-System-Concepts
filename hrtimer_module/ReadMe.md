@@ -42,4 +42,3 @@ or
 ```
 # tail -f /var/log/syslog
 ```
-<img align="left" width="738" height="322" src=sample_output.png>
