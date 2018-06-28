@@ -100,7 +100,7 @@ static void __exit hrt_mod_exit(void)
 		printk(KERN_INFO "hrtimer cancelled (%d)\n", ret);
 	}
 
-	printk(KERN_INFO "%s: Exiting hrtimer\n", __FUNCTION__);
+	printk(KERN_INFO "%s: removing hrt_mod\n", __FUNCTION__);
 }
 module_exit(hrt_mod_exit);
 
