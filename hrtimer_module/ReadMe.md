@@ -34,9 +34,6 @@ The module can be removed from the kernel anytime after it is inserted using:
 # rmmod hrt_mod.ko
 ```
 #### Sample Output
-<p>
-<img align="left" width="738" height="322" src=sample_output.png>
-</p>
 The module prints information to the Kernel log files, which can be read with any of the commands below:
 ```
 # dmesg
@@ -45,3 +42,4 @@ or
 ```
 # tail -f /var/log/syslog
 ```
+<img align="left" width="738" height="322" src=sample_output.png>
