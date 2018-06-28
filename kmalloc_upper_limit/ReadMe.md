@@ -25,7 +25,7 @@ $ svn export https://github.com/shahsharvil/Operating-System-Internals/trunk/kma
 ```
 # insmod kmalloc_test.ko
 ```
-The init function of the module checks the maximum amount of RAM that can be allocated with a single call to kmalloc.
+ The init function of the module checks the maximum amount of RAM that can be allocated with a single call to kmalloc.
  
  4. The module can be removed from the kernel anytime after it is inserted using:
 ```
@@ -41,3 +41,5 @@ or
 # tail -f /var/log/syslog
 ```
 ![](sample_output.png)
+
+As can be seen, kmalloc is able to allocate a maximum of 4096 KiB or 4 MiB of memory (that is physically contiguous).
