@@ -5,7 +5,7 @@
 #include <linux/hrtimer.h>
 #include <linux/jiffies.h>
 
-#define MAX 15
+#define MAX_ITR 15
 
 static struct hrtimer my_hrt;
 static ktime_t period_ns;
@@ -26,7 +26,7 @@ static enum hrtimer_restart timer_callback_func(struct hrtimer *timer)
 	static volatile int itr = 0;
 	ktime_t ktime_now;
 
-	if(itr < MAX)
+	if(itr < MAX_ITR)
 	{
 		ktime_now = hrtimer_cb_get_time(timer);
 		hrtimer_forward(timer, ktime_now, period_ns);
