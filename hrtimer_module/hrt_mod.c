@@ -31,7 +31,7 @@ static enum hrtimer_restart timer_callback_func(struct hrtimer *timer)
 		ktime_now = hrtimer_cb_get_time(timer);
 		hrtimer_forward(timer, ktime_now, period_ns);
 		printk(KERN_INFO "%2d \t %llu \t %lld\n", 
-						  itr + 1, get_jiffies_64(), ktime_to_ns(ktime_now));
+			itr + 1, get_jiffies_64(), ktime_to_ns(ktime_now));
 		itr++;
 		return HRTIMER_RESTART;
 	}
