@@ -15,21 +15,24 @@ High resolution timers were introduced in linux to support timers with resolutio
 The hrt_mod.c source code demonstrates the usage of the hrtimer API available in linux.
 
 #### Directions to build the `hrt_mod` module
- 1. Download the `hrtimer_module` sub-directory. To do this, open a new terminal window, and execute the following command.
+ 1. I assume that your system has `subversion` installed. To download the `hrt_module` sub-directory, open a new terminal window, and execute:
 ```
 $ svn export https://github.com/shahsharvil/Operating-System-Internals/trunk/hrtimer_module
 ```  
- 2. Switch to **_root_** user and run:
+ 2. Switch to **_root_** user and compile the source code with `make`.
 ```
 # cd hrtimer_module
 ```
 ```
 # make
 ```
+ 3. Insert the module into the kernel.
 ```
 # insmod hrt_mod.ko
 ```
-The module can be removed from the kernel anytime after it is inserted using:
+This will initialize and start the hrtimer with a default period of 1 second. The expiry time of timer is extended by this period everytime the timer expires. The number of times the timer is forwarded is controlled by the preprocessor directive 'MAX_ITR`.
+ 
+ 4. The module can be removed from the kernel anytime after it is inserted using:
 ```
 # rmmod hrt_mod.ko
 ```
