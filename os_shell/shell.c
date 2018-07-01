@@ -270,8 +270,8 @@ int exec_pipe_cmd(char** parsed_args, char** parsed_args_after_pipe)
  
         	if (child_2 < 0)
 		{
-            	printf("unable to fork!\n");
-            	return -1;
+            		printf("unable to fork!\n");
+            		return -1;
         	}
  
         	if (child_2 == 0)
