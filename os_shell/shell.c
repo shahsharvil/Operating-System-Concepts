@@ -230,76 +230,79 @@ int exec_cmd(char **parsed_args)
  */
 int exec_pipe_cmd(char** parsed_args, char** parsed_args_after_pipe)
 {
-    int pipefd[2]; 
-    pid_t child_1, child_2;
+	int pipefd[2]; 
+    	pid_t child_1, child_2;
  
-    if (pipe2(pipefd, 0) < 0) {
-        printf("cannot create pipe, errno: %d\n", errno);
-        return -1;
-    }
-    child_1 = fork();
-    if (child_1 < 0) {
-        printf("unable to fork!\n");
-        return -1;
-    }
+    	if (pipe2(pipefd, 0) < 0)
+	{
+        	printf("cannot create pipe, errno: %d\n", errno);
+        	return -1;
+    	}
+    	child_1 = fork();
+    	if (child_1 < 0)
+	{
+        	printf("unable to fork!\n");
+        	return -1;
+    	}
  	
-    if (child_1 == 0)
-    {
-        close(pipefd[0]);
-        dup2(pipefd[1], STDOUT_FILENO);
-        close(pipefd[1]);
- 
-        if (execvp(parsed_args[0], parsed_args) < 0)
-        {
-#ifdef COLOR
-        	red();
-#endif
-        	printf("Error: ");
-#ifdef COLOR
-        	white();
-#endif 
-            	printf("cannot execute command %s\n", parsed_args[0]);
-           	exit(0);
-        }
-    }
-    else
-    {	
-        child_2 = fork();
- 
-        if (child_2 < 0) {
-            printf("unable to fork!\n");
-            return -1;
-        }
- 
-        if (child_2 == 0)
-        {	
-            close(pipefd[1]);
-            dup2(pipefd[0], STDIN_FILENO);
-            close(pipefd[0]);
-            if (execvp(parsed_args_after_pipe[0], parsed_args_after_pipe) < 0)
-            {
-#ifdef COLOR
-        	red();
-#endif
-        	printf("Error: ");
-#ifdef COLOR
-        	white();
-#endif    	
-            	printf("cannot execute command %s\n", parsed_args_after_pipe[0]);
-                exit(0);
-            }
-        }
-        else
-        {	
+    	if (child_1 == 0)
+    	{
         	close(pipefd[0]);
+        	dup2(pipefd[1], STDOUT_FILENO);
         	close(pipefd[1]);
+ 
+        	if (execvp(parsed_args[0], parsed_args) < 0)
+        	{
+#ifdef COLOR
+        		red();
+#endif
+        		printf("Error: ");
+#ifdef COLOR
+        		white();
+#endif 
+            		printf("cannot execute command %s\n", parsed_args[0]);
+           		exit(0);
+        	}
+    	}
+    	else
+    	{	
+        	child_2 = fork();
+ 
+        	if (child_2 < 0)
+		{
+            	printf("unable to fork!\n");
+            	return -1;
+        	}
+ 
+        	if (child_2 == 0)
+        	{	
+        	    	close(pipefd[1]);
+        	    	dup2(pipefd[0], STDIN_FILENO);
+        	    	close(pipefd[0]);
+        	    	if (execvp(parsed_args_after_pipe[0], parsed_args_after_pipe) < 0)
+        	    	{
+#ifdef COLOR
+        			red();
+#endif		
+      		  		printf("Error: ");
+#ifdef COLOR
+        			white();
+#endif    	
+            			printf("cannot execute command %s\n", parsed_args_after_pipe[0]);
+                		exit(0);
+            	    	}
+       		}
+        	else
+        	{	
+        		close(pipefd[0]);
+        		close(pipefd[1]);
 
-            wait(NULL);
-            wait(NULL);
-        }
-    }
+            		wait(NULL);
+           		wait(NULL);
+        	}
+    	}
 
-    return 0;
+    	return 0;
 }
 
 
