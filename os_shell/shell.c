@@ -2,8 +2,8 @@
 #include <stdio.h>	
 #include <string.h>
 #include <errno.h>
-#include <stdlib.h>			/* getenv() */
-#include <unistd.h>			/* getcwd(), chdir() */
+#include <stdlib.h>		/* getenv() */
+#include <unistd.h>		/* getcwd(), chdir() */
 #include <inttypes.h>		/* uint8_t */
 #include <sys/wait.h>		/* wait() */
 
@@ -230,7 +230,7 @@ int exec_cmd(char **parsed_args)
  */
 int exec_pipe_cmd(char** parsed_args, char** parsed_args_after_pipe)
 {
-	int pipefd[2]; 
+    int pipefd[2]; 
     pid_t child_1, child_2;
  
     if (pipe2(pipefd, 0) < 0) {
@@ -258,8 +258,8 @@ int exec_pipe_cmd(char** parsed_args, char** parsed_args_after_pipe)
 #ifdef COLOR
         	white();
 #endif 
-            printf("cannot execute command %s\n", parsed_args[0]);
-            exit(0);
+            	printf("cannot execute command %s\n", parsed_args[0]);
+           	exit(0);
         }
     }
     else
@@ -285,7 +285,7 @@ int exec_pipe_cmd(char** parsed_args, char** parsed_args_after_pipe)
 #ifdef COLOR
         	white();
 #endif    	
-            printf("cannot execute command %s\n", parsed_args_after_pipe[0]);
+            	printf("cannot execute command %s\n", parsed_args_after_pipe[0]);
                 exit(0);
             }
         }
