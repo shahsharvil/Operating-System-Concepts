@@ -1,5 +1,6 @@
 #### os_shell
 A simple shell implemented in C.
+
 ![](images/start_screen.png)
 
 #### Support
@@ -8,9 +9,13 @@ Markup :
 * Explicity written `cd`, `clear`, `help` and `exit` functions.
 * Supports running executables.
 * Supports 1 layer of piping, example - man getpid | grep return
+
 ![](images/piping_example.png)
+
 * This version of the shell uses `execvp` to run commands not explicitly written. This means that most commands available will work.
+
 ![](images/general_commands.png)
+
 * Note: The shell currently does not support command history (using the `up` arrow key) and autofill (`TAB` key) options. 
 #### Directions to make and run the `my_shell` executable.
  1. I assume that your system has `subversion` installed. To download the `kmalloc_upper_limit` sub-directory, open a new terminal window, and execute:
