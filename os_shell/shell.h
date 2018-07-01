@@ -2,8 +2,8 @@
 #define _SHELL_H_
 
 #define MAX_COMMAND_LEN	100
-#define MAX_ARGS 		10
-#define MY_COMMANDS 	4
+#define MAX_ARGS 		    10
+#define MY_COMMANDS 	  4
 
 #define clear() printf("\033[H\033[J")
 
