@@ -26,7 +26,7 @@ void init_shell()
 	char *value = getenv("USER");
 	printf("\n\n\t\tWelcome! @%s\n\n", value);
 	puts("\tShell_Author:  Sharvil Shah");
-	puts("\tShell_Version: v1.1");
+	puts("\tShell_Version: v18.7");
 
 	sleep(2);	
 	clear();
