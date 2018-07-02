@@ -17,8 +17,8 @@
  *
  *	@handler_time	: stores start time of ISR execution
  *	@trigger_time	: stores time right before square wave generation
- *	@irq 			: irq line number
- *	@missed_int		: counter for missed interrupts
+ *	@irq 		: irq line number
+ *	@missed_int	: counter for missed interrupts
  */
 struct itr_latency_data
 {
