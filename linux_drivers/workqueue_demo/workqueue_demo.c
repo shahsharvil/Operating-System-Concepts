@@ -1,9 +1,6 @@
 /*
- *
- *  Driver for a RGB led device
- * 
- *  This program supports access to control intensity of a RGB-Led. The
- *  support is provided using high resolution timers.
+ *  Driver to demonstrate implementation and properties
+ *  of linux workqueues.
  *
  *  Author - Sharvil Shah <spshah16@asu.edu>
  *
