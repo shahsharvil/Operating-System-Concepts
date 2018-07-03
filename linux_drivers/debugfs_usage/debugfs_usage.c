@@ -15,9 +15,9 @@
 /*
  *	struct module_data
  *
- *	@dirret				: dentry object of our directory inside debugfs
+ *	@dirret			: dentry object of our directory inside debugfs
  *	@intr_ret,@trig_ret	: dentry objects of children directories
- *	@irq 				: irq line number
+ *	@irq 			: irq line number
  *	@interrupt_count	: counter for interrupts acknowledged
  *	@trigger_count		: counter for triggers (square wave cycles)
  *						generated at GPIO2
@@ -162,20 +162,20 @@ __init debugfs_usage_module_init(void)
 
 	data_ptr->dirret = debugfs_create_dir("debugfs_usage_dir", NULL);
       
-    data_ptr->intr_ret = debugfs_create_u64("interrupt_count", 0444,
-    	data_ptr->dirret, &data_ptr->interrupt_count);
-    if (!data_ptr->intr_ret)
-    {
-        printk("error creating int file");
-        return (-ENODEV);
-    }
+    	data_ptr->intr_ret = debugfs_create_u64("interrupt_count", 0444,
+    		data_ptr->dirret, &data_ptr->interrupt_count);
+    	if (!data_ptr->intr_ret)
+    	{
+        	printk("error creating int file");
+        	return (-ENODEV);
+    	}
 
-    data_ptr->trig_ret = debugfs_create_u64("trigger_count", 0444,
-    	data_ptr->dirret, &data_ptr->trigger_count);
-    if (!data_ptr->trig_ret) {
-        printk("error creating int file");
-        return (-ENODEV);
-    }
+   	data_ptr->trig_ret = debugfs_create_u64("trigger_count", 0444,
+    		data_ptr->dirret, &data_ptr->trigger_count);
+    	if (!data_ptr->trig_ret) {
+        	printk("error creating int file");
+        	return (-ENODEV);
+    	}
 
 	generate_square_waves();
 	return 0;
