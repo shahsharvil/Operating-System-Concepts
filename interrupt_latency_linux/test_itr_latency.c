@@ -94,7 +94,7 @@ measure_itr_latency(void)
  *
  *	Details:
  *		- called by latency_module_init function
- *		- frees gpio pins and irq line requested by demo_dev_open
+ *		- frees gpio pins and irq line requested by latency_module_init
  *		- returns 0 on success
  */
 static void
