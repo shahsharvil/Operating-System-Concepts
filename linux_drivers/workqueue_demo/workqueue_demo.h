@@ -20,7 +20,7 @@
 #define GPIO2 13
 #define GPIO2_LEV 34
 
-/*	12 and 28 correspond to linux pin_no
+/*	0 and 18 correspond to linux pin_no
  *	and level shifter resp. for GPIO5
  */
 #define led 0
